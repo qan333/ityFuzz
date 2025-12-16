@@ -1,0 +1,57 @@
+# ItyFuzz EVM Ablation Study Configuration
+# Replicates the experiment from the research paper
+
+# Test Configurations (Table 1 variants)
+CONFIGS:
+  - name: "ItyFuzz"
+    description: "Full ItyFuzz with all features"
+    args: []
+    
+  - name: "ItyFuzz-DF"
+    description: "ItyFuzz with Dataflow analysis"
+    args: ["--dataflow"]
+    
+  - name: "ItyFuzz-Rand"
+    description: "ItyFuzz with Random fuzzing only"
+    args: ["--random"]
+
+# Smart Contracts to Test (from Table 1)
+CONTRACTS:
+  - name: "dvd_unstoppable"
+    exploit_type: "DoS"
+    expected_time: "1.4s"
+    
+  - name: "bacon_protocol"
+    exploit_type: "Reentrancy"
+    expected_time: "16.4s"
+    
+  - name: "n00d_token"
+    exploit_type: "Reentrancy"
+    expected_time: "28.2s"
+    
+  - name: "egd_finance"
+    exploit_type: "Price Manipulation"
+    expected_time: "9.3s"
+    
+  - name: "contract1_undisclosed"
+    exploit_type: "Access Control"
+    expected_time: "0.7s"
+    
+  - name: "contract2_undisclosed"
+    exploit_type: "Reentrancy"
+    expected_time: "1.6s"
+
+# Fuzzing Parameters
+FUZZING:
+  timeout: 3600  # seconds per contract
+  max_iterations: 10000
+  memory_limit: 4096  # MB
+  seed: 0
+
+# Output Configuration
+OUTPUT:
+  results_dir: "results"
+  log_dir: "results/logs"
+  data_dir: "results/data"
+  csv_output: "results/data/results.csv"
+  plot_output: "results/data/plots"
