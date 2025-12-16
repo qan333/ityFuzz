@@ -29,6 +29,7 @@ class RQ3StateOverheadAnalyzer:
         self.results_dir.mkdir(exist_ok=True)
         self.logs_dir.mkdir(exist_ok=True)
         self.data_dir.mkdir(exist_ok=True)
+        self.contracts_dir.mkdir(exist_ok=True)
         
         # Test configurations (RQ3 variants)
         self.configs = {
