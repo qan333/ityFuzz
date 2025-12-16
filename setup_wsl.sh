@@ -1,11 +1,11 @@
 #!/bin/bash
-# Quick setup for WSL - Install ItyFuzz and dependencies
+# Setup for WSL - Install ItyFuzz using official ityfuzzup installer
 # Run this once before using run.sh
 
 set -e
 
 echo "=========================================="
-echo "ItyFuzz EVM Setup for WSL"
+echo "ItyFuzz EVM Setup for WSL (Official Installer)"
 echo "=========================================="
 
 # Update system
@@ -13,51 +13,36 @@ echo "[*] Updating system packages..."
 sudo apt-get update -y
 sudo apt-get upgrade -y
 
-# Install dependencies
-echo "[*] Installing dependencies..."
+# Install system dependencies
+echo "[*] Installing system dependencies..."
 sudo apt-get install -y \
     build-essential cmake git curl wget \
     pkg-config libssl-dev libffi-dev \
-    python3 python3-pip rustc cargo
+    python3 python3-pip
 
-# Install/update Rust
-echo "[*] Setting up Rust..."
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-source $HOME/.cargo/env
-
-# Clone and build ItyFuzz
-echo "[*] Cloning ItyFuzz repository..."
-ITYFUZZ_PATH="$HOME/ityfuzz"
-
-if [ ! -d "$ITYFUZZ_PATH" ]; then
-    git clone https://github.com/fuzzland/ityfuzz.git "$ITYFUZZ_PATH"
-else
-    echo "[+] ItyFuzz already cloned, updating..."
-    cd "$ITYFUZZ_PATH"
-    git pull origin main
-fi
-
-echo "[*] Building ItyFuzz (this may take 5-10 minutes)..."
-cd "$ITYFUZZ_PATH"
-cargo build --release
-
-# Setup PATH
-echo "[*] Setting up PATH..."
-if ! grep -q "ityfuzz/target/release" ~/.bashrc; then
-    echo 'export PATH="$PATH:'$ITYFUZZ_PATH'/target/release"' >> ~/.bashrc
-    echo "[+] Added ItyFuzz to PATH in ~/.bashrc"
-fi
-
-# Install Python dependencies
+# Install Python dependencies first
 echo "[*] Installing Python dependencies..."
 pip3 install web3 pycryptodome eth-keys eth-account
 
-# Test installation
-echo "[*] Testing ItyFuzz installation..."
-if "$ITYFUZZ_PATH/target/release/ityfuzz" --help > /dev/null 2>&1; then
-    echo "[+] ItyFuzz installation successful!"
+# Official ItyFuzz installation using ityfuzzup
+echo "[*] Installing ItyFuzz using official ityfuzzup..."
+echo "[*] This will download and setup ItyFuzz with all dependencies..."
+
+# Install ityfuzzup and run it
+curl -L https://ity.fuzz.land/ | bash
+
+# Source bashrc to update PATH
+echo "[*] Updating PATH..."
+source ~/.bashrc || true
+
+# Verify installation
+echo "[*] Verifying ItyFuzz installation..."
+if command -v ityfuzz &> /dev/null; then
+    echo "[+] ItyFuzz installed successfully!"
+    ityfuzz --version 2>/dev/null || echo "[+] ItyFuzz is ready to use"
 else
-    echo "[!] ItyFuzz test failed"
+    echo "[!] ItyFuzz command not found in PATH"
+    echo "[*] Try running: source ~/.bashrc"
 fi
 
 echo ""
@@ -69,4 +54,6 @@ echo "To use ItyFuzz EVM fuzzer:"
 echo "  1. Source bashrc: source ~/.bashrc"
 echo "  2. cd $(dirname "$0")"
 echo "  3. bash run.sh"
+echo ""
+echo "To update ItyFuzz later, run: ityfuzzup"
 echo ""
